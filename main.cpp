@@ -105,7 +105,46 @@ struct Przyjaciel {
     string email;
 
 };
-int zapisywanie(vector <Przyjaciel> &ksiazkaAdresowa, int liczbaOsob, int id_zalogowanego_uzytkownika, int maxi_id_adresata) {
+
+int znajdzMaksymalneIdAdresata ()
+{
+            fstream plik;
+            int licznik=0;
+            int maxi_id_adresata=0;
+            string linia="";
+            string  identyfikator="";
+            int id=0;
+            plik.open("ksiazkaadresowa.txt", ios::in);
+            if (plik.good()==true) {
+                while (getline(plik, linia)) {
+                    int dlugoscLini=linia.length();
+                    for (int i=0; i<dlugoscLini; i++) {
+                        if (linia[i]=='|') {
+                            licznik++;
+                            i++;
+                        }
+                        if (licznik==0) {
+                            identyfikator=identyfikator+linia[i];
+                        }
+                    }
+                    id= (atoi(identyfikator.c_str()));
+                    if (maxi_id_adresata<id)
+                    {
+                        maxi_id_adresata=id;
+                    }
+                    licznik=0;
+                    identyfikator="";
+                    id=0;
+                }
+                return maxi_id_adresata;
+            }
+            else
+            {
+                return 0;
+            }
+            plik.close();
+}
+int zapisywanie(vector <Przyjaciel> &ksiazkaAdresowa, int liczbaOsob, int id_zalogowanego_uzytkownika) {
     int id_uzytkownika=id_zalogowanego_uzytkownika;
     string imie;
     string nazwisko;
@@ -128,7 +167,7 @@ int zapisywanie(vector <Przyjaciel> &ksiazkaAdresowa, int liczbaOsob, int id_zal
     cout<<"Podaj email przyjaciela: ";
     cin>>email;
 
-    int id=maxi_id_adresata+1;
+    int id=znajdzMaksymalneIdAdresata()+1;
     ksiazkaAdresowa.push_back(Przyjaciel {id, id_uzytkownika, imie,nazwisko,nrTelefonu,adres,email});
     plik<<ksiazkaAdresowa[liczbaOsob].id<<"|"<<ksiazkaAdresowa[liczbaOsob].id_uzytkownika<<"|"<<ksiazkaAdresowa[liczbaOsob].imie<<"|"<<ksiazkaAdresowa[liczbaOsob].nazwisko<<"|"<<ksiazkaAdresowa[liczbaOsob].nrTelefonu<<"|"<<ksiazkaAdresowa[liczbaOsob].adres<<"|"<<ksiazkaAdresowa[liczbaOsob].email<<"|"<<endl;
     cout<<endl<<"Przyjaciel zapisany pomyslnie";
@@ -561,7 +600,7 @@ int main() {
     int dlugoscLini=0;
     int licznik=0;
     int id_uzytkownika=0;
-    int maxi_id_adresata=1;
+
 
 
     while (1) {
@@ -629,10 +668,6 @@ int main() {
                         ksiazkaAdresowa.push_back(Przyjaciel{id, id_uzytkownika, imie, nazwisko, nrTelefonu, adres, email});
                         liczbaOsob++;
                     }
-                    if (maxi_id_adresata<id)
-                    {
-                        maxi_id_adresata=id;
-                    }
                     licznik=0;
                     identyfikator="";
                     id=0;
@@ -662,7 +697,7 @@ int main() {
 
             switch (wybor) {
             case '1': {
-                liczbaOsob=zapisywanie(ksiazkaAdresowa, liczbaOsob, id_zalogowanego_uzytkownika, maxi_id_adresata);
+                liczbaOsob=zapisywanie(ksiazkaAdresowa, liczbaOsob, id_zalogowanego_uzytkownika);
             }
             break;
             case '2': {
